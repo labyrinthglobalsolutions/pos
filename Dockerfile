@@ -11,6 +11,9 @@ COPY pom.xml .
 COPY src ./src
 RUN mvn package -DskipTests
 
+# Verify the contents of the target directory
+RUN ls -la /app/target
+
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
 
