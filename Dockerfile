@@ -4,16 +4,17 @@ FROM maven:3.9.6-amazoncorretto-8-debian AS builder
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the Maven project file
+# Copy only the Maven project file to leverage Docker layer caching
 COPY pom.xml .
 
 # Download dependencies
 RUN mvn dependency:go-offline -B
 
-# Copy the project source code
+# Copy the entire project source code
 COPY src ./src
 
-
+# Build the application without debugging output
+RUN mvn clean package -DskipTests
 
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
@@ -21,8 +22,8 @@ FROM openjdk:17-jdk-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the JAR file from the builder stage
-COPY --from=builder /app/target/Point_Of_Sale.jar ./Point_Of_Sale.jar
+# Copy the built JAR file from the builder stage
+COPY --from=builder /app/target/Point_Of_Sale.jar .
 
 # Expose port 9094
 EXPOSE 9094
