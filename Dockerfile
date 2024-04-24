@@ -14,7 +14,7 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Clean and package the application
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -X
 
 # Verify the contents of the target directory
 RUN ls -la /app/target
