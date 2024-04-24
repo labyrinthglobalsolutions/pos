@@ -14,10 +14,7 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Clean and package the application
-RUN mvn clean package -DskipTests -X
-
-# Verify the contents of the target directory
-RUN ls -la /app/target
+RUN mvn clean package -DskipTests
 
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
