@@ -1,5 +1,5 @@
-# Use an official Maven image as a base image for building
-FROM maven:3.8.1-openjdk-17 AS builder
+# Use an official Maven 3.9.6 image with Amazon Corretto 8 as a base image for building
+FROM maven:3.9.6-amazoncorretto-8-debian AS builder
 
 # Set the working directory in the container
 WORKDIR /app
