@@ -7,9 +7,14 @@ WORKDIR /app
 # Copy the Maven project file
 COPY pom.xml .
 
-# Download dependencies and package the application
+# Download dependencies
+RUN mvn dependency:go-offline -B
+
+# Copy the project source code
 COPY src ./src
-RUN mvn package -DskipTests
+
+# Clean and package the application
+RUN mvn clean package -DskipTests
 
 # Verify the contents of the target directory
 RUN ls -la /app/target
