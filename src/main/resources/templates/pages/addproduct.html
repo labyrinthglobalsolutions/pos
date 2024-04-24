@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Home</title>
+    <style>
+        /* Increase label size */
+        label.col-form-label {
+            font-size: 18px;
+        }
+
+        /* Increase text size */
+        input.form-control,
+        select.form-control,
+        textarea.form-control {
+            font-size: 16px;
+        }
+
+        /* Modify button */
+        button.btn-primary,
+        button.btn-secondary {
+            font-size: 18px;
+            border-radius: 10px;
+        }
+
+        button.btn-primary {
+            background-color: #007bff; /* Blue */
+            border-color: #007bff;
+        }
+
+        button.btn-secondary {
+            background-color: #6c757d; /* Gray */
+            border-color: #6c757d;
+            color: white;
+        }
+
+        button.btn-primary:hover {
+            background-color: #0056b3; /* Darker blue */
+            border-color: #0056b3;
+        }
+
+        button.btn-secondary:hover {
+            background-color: #5a6268; /* Darker gray */
+            border-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="row">
+        <div class="col-lg-12 stretch-card"></div>
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <form id="insertProductForm">
+                    <div class="card-body">
+                        <h4 class="card-title">Product</h4>
+                        <div class="row">
+                            <hr>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Category</label>
+                                <select type="text" class="form-control" name="category" id="category_id"></select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">SubCategory</label>
+                                <select type="text" class="form-control" name="subcategory" id="subcategory_id"></select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Brand</label>
+                                <select type="text" class="form-control" name="brand" id="brand_id"></select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Name</label>
+                                <input type="text" class="form-control" name="name" id="name">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Quantity</label>
+                                <input type="text" class="form-control" name="quantity" id="quantity">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Selling Price</label>
+                                <input type="text" class="form-control" name="selling_price" id="selling_price">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Price</label>
+                                <input type="number" class="form-control" name="price" id="price">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Product Code</label>
+                                <input type="text" class="form-control" name="productCode" id="product_code" placeholder="Scan Bar Code">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">GST(%)</label>
+                                <input type="number" class="form-control" name="gst_percent" id="gst_percent">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">GST Type</label>
+                                <select class="form-control" name="gst_type" id="gst_type">
+                                    <option value="">-- Select GST Type --</option>
+                                    <option value="Included">Included</option>
+                                    <option value="Excluded">Excluded</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">HSN No.</label>
+                                <input type="text" class="form-control" name="hsn_no" id="hsn_no">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Description</label>
+                                <textarea class="form-control" name="description" id="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).on('submit', '#insertProductForm', function (event) {
+            event.preventDefault();
+            if ($("#insertProductForm").find('input.is-invalid').length === 0) {
+                var postData = new FormData();
+                var formData = $(this).serializeArray();
+                $(formData).each(function(index, obj){
+                    postData.append(obj.name,obj.value);
+                });
+                $.ajax({
+                    url: "/products/add",
+                    data: postData,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    success: function (data) {
+                        showMessage('Good Job !!', 'Data Successfully Added!!!!', 'success');
+                        $('#insertProductForm')[0].reset();
+                        $('#insertModal').modal('hide'); // Corrected 'toggle' to 'modal' for hiding the modal
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                    },
+                    error: function (xhr, status, error) {
+                        showMessage('Error !!', 'Failed to add data', 'danger');
+                    }
+                });
+            } else {
+                showMessage('Ooops !!', 'Wrong Data', 'danger');
+            }
+        });
+    </script>
+</section>
+</body>
+</html>

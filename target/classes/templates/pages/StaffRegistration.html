@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS</title>
+    <link rel="stylesheet" th:href="@{/css/staff.css}">
+
+    <script>
+        function validateForm() {
+            var name = document.getElementById("name").value;
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+            var role = document.getElementById("role").value;
+            var termsAccepted = document.getElementById("termsAccepted").checked;
+
+            if (name.trim() === "") {
+                alert("Please enter your name.");
+                return false;
+            }
+
+            if (email.trim() === "") {
+                alert("Please enter your email address.");
+                return false;
+            } else if (!isValidEmail(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+
+            if (password.trim() === "") {
+                alert("Please create a password.");
+                return false;
+            } else if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return false;
+            }
+
+            if (role === "") {
+                alert("Please select a role.");
+                return false;
+            }
+
+            if (!termsAccepted) {
+                alert("Please accept the terms & conditions.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            var emailRegex = /^\S+@\S+\.\S+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</head>
+<body>
+<div class="wrapper">
+    <h2>Registration</h2>
+    <form th:action="@{StaffRegistration}" method="post" role="form" th:object="${user}" onsubmit="return validateForm()">
+        <div class="input-box">
+            <input type="text" id="name" name="name" placeholder="Enter your Name" required>
+        </div>
+
+        <div class="input-box">
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="input-box">
+            <input type="password" id="password" name="password" placeholder="Create password" required>
+        </div>
+
+        <div class="input-box">
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+        </div>
+
+        <div class="input-box">
+            <select id="role" name="roles" required>
+                <option value="">Select a Role</option>
+                <option value="INVENTORY_STAFF">Inventory Staff</option>
+                <option value="CASHIER">Cashier</option>
+            </select>
+        </div>
+
+        <div class="policy">
+            <input type="checkbox" id="termsAccepted">
+            <label for="termsAccepted">I accept all terms & conditions</label>
+        </div>
+
+        <div class="input-box button">
+            <input type="submit" value="Register Now">
+        </div>
+
+        <div class="text">
+            <h3>Already have an account? <a href="/login">Login now</a></h3>
+        </div>
+    </form>
+</div>
+</body>
+</html>

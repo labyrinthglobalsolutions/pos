@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sale Module</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 80%;
+                margin: 20px auto;
+            }
+            .point-of-sale {
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                color: black;
+                padding: 10px;
+                border-top: 3px solid;
+                border-color: #34acde;
+                background: #ffffff;
+                border-bottom: 1px solid #e5e5e5;
+            }
+            .product-form {
+                background-color: white;
+                padding: 20px;
+                border-radius: 5px;
+            }
+            .gray-bar {
+                background-color: #ddd;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #555;
+                color: white;
+            }
+            .amount-box{
+                padding: 10px;
+                background: #fff;
+                margin-bottom: 10px;
+            }
+            .product-input{
+                padding: 25px;
+                font-size: 18px;
+            }
+            .payment-card{
+                background: linear-gradient(120deg, #00e4d0, #5983e8);
+                color: #ffffff;
+                box-shadow: 0px 0px 2px 2px #ececec;
+                padding: 10px;
+                font-size: 14px;
+                border: none;
+                margin: 15px 5px 0px 0px;
+                font-weight: 400;
+                border-radius: 10px;
+                cursor: pointer;
+            }
+
+            .orderButton-active{
+                background: linear-gradient(120deg, #00e4d0, #5983e8);
+                color: #ffffff;
+            }
+        </style>
+    </head>
+    <body>
+        <section layout:fragment="content">
+            <input type="hidden" id="no_of_tabs">
+            <input type="hidden" id="current_tab">
+            <button class="btn btn-success" onclick="createOrder()">Create Order</button>
+
+            <div class="tabs mt-2" id="orderTabsButton" style="background:#fff;padding:20px;">
+                <h5>Pending Orders</h5>
+                <hr>
+            </div>
+
+            <div class="container-fluide mt-2" id="orderSection">
+
+            </div>
+
+            <script>
+                $(document).ready(function () {
+                    getPreviousOrder();
+                })
+
+                function getAmounts(order_id)
+                {
+                    $.ajax({
+                        url: "/pos/get-order-details/" + order_id,
+                        type: "GET",
+                        dataType:"json",
+                        success: function (data) {
+                            var dataArr = data[0];
+                            $("#subTotal"+order_id).html(dataArr['totalRate']);
+                            $("#taxAmount"+order_id).html(dataArr['totalGst']);
+                            $("#grandTotal"+order_id).html(dataArr['grandTotal']);
+                        },
+                        error: function (xhr, status, error) {
+                            showMessage('Error !!', 'Failed to retrieve category data', 'danger');
+                        }
+                    });
+                }
+
+                function getOrderProducts(order_id)
+                {
+                    $.ajax({
+                        url: "/pos/get-order-items/" + order_id,
+                        type: "GET",
+                        dataType:"json",
+                        success: function (data) {
+                            var html = "";
+                            var sno = 1;
+                            for(let i = 0; i < data.length; i++){
+                                let product_code = data[i]["productCode"];
+                                $.ajax({
+                                    url: "/products/get-product-by-code/" + product_code,
+                                    type: "GET",
+                                    dataType:"json",
+                                    success: function (productDetails) {
+                                        console.log(productDetails);
+                                        let product_name = '';
+                                        if(productDetails.length > 0){
+                                            product_name = productDetails[0]["name"];
+                                        }
+                                        html += '<tr>';
+                                        html += '<td>'+sno+'</td>';
+                                        html += '<td>'+data[i]["qty"]+'</td>';
+                                        html += '<td>'+data[i]["productCode"]+'</td>';
+                                        html += '<td>'+product_name+'</td>';
+                                        html += '<td>'+data[i]["totalRate"]+'</td>';
+                                        html += '<td>'+data[i]["totalGst"]+'</td>';
+                                        html += '<td>'+data[i]["sellingPrice"]+'</td>';
+                                        html += '</tr>';
+                                        sno++;
+                                    }
+                                })
+                            }
+                            setTimeout(function () {
+                                console.log(html);
+                                $("#itemList"+order_id).html(html);
+                            }, 2000);
+                        },
+                        error: function (xhr, status, error) {
+                            showMessage('Error !!', 'Failed to retrieve category data', 'danger');
+                        }
+                    });
+                }
+
+                $(document).on("change", ".product-input", function(){
+                    var order_id = $(this).data("id");
+                    var product_code = $(this).val();
+                    var formData = new FormData();
+                    formData.append('productCode', product_code);
+                    formData.append('orderId', order_id);
+                    $.ajax({
+                        url:"/pos/add-product-to-order",
+                        type:"POST",
+                        data:formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            if(data == '201'){
+                                showMessage('Error !!', 'Not Available In Inventory', 'danger');
+                            }else if(data == '202'){
+                                showMessage('Error !!', 'Wrong Code', 'danger');
+                            }else{
+                                showMessage('Success', 'Product Added', 'success');
+                                getOrderProducts(order_id);
+                                getAmounts(order_id);
+                            }
+                            $(".product-input").val("");
+                        }
+                    })
+                });
+
+                $(document).on("click", ".orderButton", function(e){
+                    $(".order-tabs").css("display", "none");
+                    var order_id = $(this).data('id');
+                    $("#orderTab"+order_id).css("display", "flex");
+                    $(".orderButton").addClass("btn-default").removeClass("orderButton-active");
+                    $(this).addClass("orderButton-active").removeClass("btn-default");
+                });
+
+                function createOrder()
+                {
+                    let order_id = '';
+                    $.ajax({
+                        url:"/pos/create-new-order",
+                        type:'GET',
+                        success:function(data){
+                            order_id = data;
+                            createTab(order_id);
+                            createTabButton(order_id);
+                        }
+                    })
+                }
+
+                function getPreviousOrder()
+                {
+                    let order_id = '';
+                    $.ajax({
+                        url:"/pos/get-pending-orders",
+                        type:'GET',
+                        success:function(data){
+                            if(data.length > 0){
+                                for(let o = 0; o < data.length; o++){
+                                    var order_id = data[o]['orderId'];
+                                    createTab(data[o]);
+                                    createTabButton(order_id);
+                                    $(".order-tabs").css("display","none");
+                                }
+                            }
+                        }
+                    })
+                }
+
+                function createTabButton(order_id)
+                {
+                    var html = '<button class="btn btn-default orderButton mr-2" data-id="'+order_id+'">#'+order_id+'</button>';
+                    $("#orderTabsButton").append(html);
+                }
+
+                function createTab(data)
+                {
+                    var i = data['orderId'];
+                    var total = '₹'+data['grandTotal'];
+                    var total_gst = '₹'+data['totalGst'];
+                    var total_rate = '₹'+data['totalRate'];
+                    var html = '<div class="row order-tabs" id="orderTab'+i+'">\n' +
+                        '                    <div class="col-md-8">\n' +
+                        '                        <div class="point-of-sale">\n' +
+                        '                            Order ID: <span id="orderId'+i+'">#'+i+'</span>\n' +
+                        '                        </div>\n' +
+                        '                        <div class="product-form">\n' +
+                        '                            <form class="posForm">\n' +
+                        '                                <input type="text" id="product_code'+i+'" name="product_code" class="form-control product-input" data-id="'+i+'" placeholder="Scan Product Bar Code Or Enter Product Code Here">\n' +
+                        '                            </form>\n' +
+                        '                            <div class="table-responsive">\n' +
+                            '                            <table class="table table-bordered table-striped table-condensed">\n' +
+                            '                                <thead>\n' +
+                                '                                <tr>\n' +
+                                '                                    <th>Sl. No.</th>\n' +
+                                '                                    <th>Qty</th>\n' +
+                                '                                    <th>Code</th>\n' +
+                                '                                    <th>Product</th>\n' +
+                                '                                    <th>Price</th>\n' +
+                                '                                    <th>GST</th>\n' +
+                                '                                    <th>Total</th>\n' +
+                                '                                </tr>\n' +
+                            '                                </thead>\n' +
+                            '                                <tbody id="itemList'+i+'">\n' +
+                            '                                </tbody>\n' +
+                            '                            </table>\n' +
+                            '                        </div>\n' +
+                        '                        </div>\n' +
+                        '                    </div>\n' +
+                        '                    <div class="col-md-4">\n' +
+                        '                        <div class="point-of-sale">\n' +
+                        '                            Amount\n' +
+                        '                        </div>\n' +
+                        '                        <div class="amount-box">\n' +
+                        '                            <div>Sub Total: <span id="subTotal'+i+'">'+total_rate+'</span></div>\n' +
+                        '                            <div>Tax Amount: <span id="taxAmount'+i+'">'+total_gst+'</span></div>\n' +
+                        '                            <div class="font-weight-bold">Grand Total: <span id="grandTotal'+i+'">'+total+'</span></div>\n' +
+                        '                        </div>\n' +
+                        '                        <div class="point-of-sale">\n' +
+                        '                            Customer Details\n' +
+                        '                        </div>\n' +
+                        '                        <div class="amount-box">\n' +
+                        '                            <div>Mobile No.<span class="text-danger">*</span>: <input type="number" class="form-control" name="customer_mobile_no" id="customer_mobile_no'+i+'"></div>\n' +
+                        '                            <div>Customer Name: <input type="text" class="form-control" name="customer_name" id="customer_name'+i+'"></div>\n' +
+                        '                            <div>GST No.: <input type="text" class="form-control" name="customer_gst_no" id="customer_gst_no'+i+'"></div>\n' +
+                        '                        </div>\n' +
+                        '                        <div class="point-of-sale">\n' +
+                        '                            Payment Method\n' +
+                        '                        </div>\n' +
+                        '                        <div class="amount-box">\n' +
+                        '                            <button class="payment-card" onclick="placeOrder(\''+i+'\', \'cash\')">\n' +
+                        '                                Cash\n' +
+                        '                            </button>\n' +
+                        '                            <button class="payment-card">\n' +
+                        '                                Credit Card\n' +
+                        '                            </button>\n' +
+                        '                            <button class="payment-card">\n' +
+                        '                                Debit Card\n' +
+                        '                            </button>\n' +
+                        '                            <button class="payment-card">\n' +
+                        '                                UPI\n' +
+                        '                            </button>\n' +
+                        '                            <button class="payment-card">\n' +
+                        '                                Net Banking\n' +
+                        '                            </button>\n' +
+                        '                        </div>\n' +
+                        '\n' +
+                        '                    </div>\n' +
+                        '                </div>';
+
+                    $("#orderSection").append(html);
+                    getOrderProducts(i);
+                }
+
+                function placeOrder(order_id, payment_mode)
+                {
+                    let order_id_encode = btoa(order_id);
+                    let mobile_no = $("#customer_mobile_no"+order_id).val();
+                    let name = $("#customer_name"+order_id).val();
+                    let gst_no = $("#customer_gst_no"+order_id).val();
+                    let data = {
+                            'orderStatus':'SUCCESS',
+                            'customerName':name,
+                            'mobileNo':mobile_no,
+                            'gstNo':gst_no,
+                            'paymentMode':payment_mode,
+                            'order_id':order_id
+                    };
+                    $.ajax({
+                        url: "/pos/place-order",
+                        type: "POST",
+                        data: data,
+                        header:{
+                            'Content-Type':'application/json',
+                        },
+                        success:function(data){
+                            console.log(data);
+                            setTimeout(function (){
+                                location.href="/pages/invoice?order_id="+order_id_encode
+                            }, 2000);
+                        }
+                    });
+                }
+            </script>
+        </section>
+
+    </body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>User List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        /* Add custom styles here */
+        .active-status, .inactive-status {
+            padding: 10px 20px; /* Increase padding for buttons */
+            border: none;
+            border-radius: 8px; /* Rounded corners for buttons */
+            cursor: pointer;
+            font-size: 16px; /* Increase font size */
+            font-weight: bold; /* Make text bold */
+        }
+
+        .active-status {
+            color: white;
+            background-color: green;
+        }
+
+        .inactive-status {
+            color: white;
+            background-color: red;
+        }
+
+        .enable-button, .disable-button {
+            padding: 10px 20px; /* Increase button padding */
+            border: none;
+            border-radius: 8px; /* Rounded corners for buttons */
+            cursor: pointer;
+            font-size: 16px; /* Increase font size */
+            font-weight: bold; /* Make text bold */
+        }
+
+        .enable-button {
+            background-color: green;
+            color: white;
+        }
+
+        .disable-button {
+            background-color: red;
+            color: white;
+        }
+
+        /* Increase table size */
+        .table-responsive {
+            overflow-x: auto;
+            min-width: 100%;
+        }
+
+        .table {
+            min-width: 100%;
+        }
+
+        /* Increase table cell padding */
+        table {
+            border-spacing: 20px; /* Increase spacing between table cells */
+        }
+
+        /* Increase font size for table header and data */
+        th, td {
+            font-size: 18px; /* Increase font size for table header and data */
+            font-weight: bold; /* Make table header and data text bold */
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">User List</h4>
+                        <div class="table-responsive">
+                            <table id="userList" class="table table-bordered dataTable">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}"></td>
+                                    <td th:text="${user.name}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td th:text="${user.roles}"></td>
+                                    <td>
+                                        <button th:if="${user.status}" class="active-status">Active</button>
+                                        <button th:unless="${user.status}" class="inactive-status">Inactive</button>
+                                    </td>
+                                    <td>
+                                        <form th:action="@{/admin/toggleUserStatus}" method="post">
+                                            <input type="hidden" name="userId" th:value="${user.id}" />
+                                            <button type="submit" th:if="${user.status}" class="disable-button">Disable</button>
+                                            <button type="submit" th:unless="${user.status}" class="enable-button">Enable</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

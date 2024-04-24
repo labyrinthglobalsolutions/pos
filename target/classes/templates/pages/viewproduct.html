@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Home</title>
+    <style>
+        /* Add custom styles for button gaps and size */
+        .btn-group {
+            margin-right: 10px; /* Add a gap between buttons */
+        }
+
+        .btn-lg {
+            padding: 12px 24px; /* Increase button size */
+            font-size: 16px; /* Increase button font size */
+        }
+
+        /* Custom border colors for buttons */
+        .btn-outline-primary {
+            border-color: #007bff; /* Blue border color for Copy button */
+        }
+
+        .btn-outline-success {
+            border-color: #28a745; /* Green border color for CSV button */
+        }
+
+        .btn-outline-info {
+            border-color: #17a2b8; /* Cyan border color for Excel button */
+        }
+
+        .btn-outline-warning {
+            border-color: #ffc107; /* Yellow border color for PDF button */
+        }
+
+        .btn-outline-danger {
+            border-color: #dc3545; /* Red border color for Print button */
+        }
+
+        /* Increase table size */
+        #viewproduct_wrapper {
+            min-width: 100%;
+        }
+
+        #viewproduct th,
+        #viewproduct td {
+            font-size: 18px; /* Increase font size for table header and data */
+            padding: 15px; /* Increase padding for table cells */
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="row">
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <div class="card-header text-right">
+                    <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#insertModal">Add Data</button>
+                    <button type="button" class="btn btn-default btn-lg">Reload</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">ViewProduct</h4>
+                    <div class="table-responsive">
+                        <table id="viewproduct" class="table table-bordered dataTable">
+                            <thead>
+                            <tr>
+                                <th>SNO</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Brand</th>
+                                <th>Description</th>
+                                <th>MRP</th>
+                                <th>GST%</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $('#viewproduct').DataTable({
+            serverSide: true,
+            processing: true,
+            searchDelay: 500,
+            ajax: {
+                url: "/products/listing",
+                type: "POST",
+                contentType: "application/json",
+                data: function (d) {
+                    return JSON.stringify(d);
+                }
+            },
+            "bDestroy": true,
+            "columnDefs": [{
+                "target": [0, 3, 4],
+                "orderable": false
+            }],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'copy',
+                    className: 'mr-4 btn-lg btn-white btn-outline-primary', // Adding margin-right, increasing size, changing background, and border color for Copy button
+                },
+                {
+                    extend: 'csv',
+                    className: 'mr-4 btn-lg  btn-white btn-outline-success', // Adding margin-right, increasing size, changing background, and border color for CSV button
+                },
+                {
+                    extend: 'excel',
+                    className: 'mr-4 btn-lg btn-white btn-outline-info', // Adding margin-right, increasing size, changing background, and border color for Excel button
+                },
+                {
+                    extend: 'pdf',
+                    className: 'mr-4 btn-lg btn-white btn-outline-warning', // Adding margin-right, increasing size, changing background, and border color for PDF button
+                },
+                {
+                    extend: 'print',
+                    className: 'btn-lg btn-white btn-outline-danger', // Increasing size, changing background, and border color for Print button
+                },
+            ],
+
+            columns: [
+                {data: "1"},
+                {data: "id"},
+                {data: "name"},
+                {data: "category_Name"},
+                {data: "subcategory_name"},
+                {data: "brand_name"},
+                {data: "description"},
+                {data: "price"},
+                {data: "gst_percent"},
+                {data: "gst_type"},
+                {
+                    data: "name",
+                    render: function (data, type, row, meta) {
+                        var button = "";
+                        button += '<button class="btn btn-info mr-2 btn-xs active" data-toggle="modal" data-target="#editModal" data-id="' + row['id'] + '" id="editCategoryButton"><i class="fa-solid fa-pen-to-square"></i></button>';
+                        button += '<button class="btn btn-danger mr-2 btn-xs active deleteProductButton" data-id="' + row['id'] + '"><i class="fa-solid fa-trash"></i></button>';
+
+                        return button;
+                    }
+                },
+            ]
+        }).buttons().container().appendTo('#viewInventory_wrapper .col-md-6:eq(0)');
+
+
+        $(document).on("click", ".deleteProductButton", function () {
+            var id = $(this).data('id');
+            if (confirm("Are you sure you want to delete this product?")) {
+                $.ajax({
+                    url: "/products/delete/" + id,
+                    type: "DELETE",
+                    dataType: "json",
+                    success: function (data) {
+                        showMessage('Success !!', 'product Successfully Deleted!', 'success');
+                        // Reload the table data or update the UI as required
+                        // For example, you can call listData() to reload the table
+                        listData();
+                    },
+                    error: function (xhr, status, error) {
+                        showMessage('Error !!', 'Failed to delete category', 'danger');
+                    }
+                });
+            }
+        });
+    </script>
+</section>
+</body>
+</html>

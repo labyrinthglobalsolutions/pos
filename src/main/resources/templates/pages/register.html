@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+
+    <script>
+        function validateForm() {
+            var name = document.getElementById("name").value;
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var role = document.getElementById("roles").value;
+
+            if (name.trim() === "") {
+                alert("Please enter your name.");
+                return false;
+            }
+
+            if (email.trim() === "") {
+                alert("Please enter your email address.");
+                return false;
+            } else if (!isValidEmail(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+
+            if (password.trim() === "") {
+                alert("Please create a password.");
+                return false;
+            }
+
+            if (role === "") {
+                alert("Please select a role.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            var emailRegex = /^\S+@\S+\.\S+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="title">
+        Admin Registration Form
+    </div>
+    <form th:action="@{/registration}" method="post" role="form" th:object="${user}" onsubmit="return validateForm()">
+        <div class="field">
+            <input th:field="*{name}" type="text" id="name" name="name" required>
+            <label>Name</label>
+        </div>
+
+        <div class="field">
+            <input th:field="*{email}" type="email" id="email" name="email" required>
+            <label>Email Address</label>
+        </div>
+
+        <div class="field">
+            <input th:field="*{password}" type="password" id="password" name="password" required>
+            <label>Password</label>
+        </div>
+
+        <div class="field">
+            <select name="roles" id="roles" th:field="*{roles}" required>
+                <option value="">Select a Role </option>
+                <option value="ADMIN">Admin </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <input type="submit" value="Register">
+        </div>
+        <div class="signup-link">
+            <a href="/login">Sign In</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

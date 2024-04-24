@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Login Form</title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link
+          href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    .img-left {
+      background: url('your-image.jpg') no-repeat center;
+      background-size: cover;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+    .title {
+      color: #333;
+      font-weight: bold;
+    }
+    .form-box {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    .form-input {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    .form-input input {
+      width: 100%;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      padding: 15px;
+      font-size: 16px;
+      color: #495057;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .form-input input:focus {
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .btn-block {
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      padding: 15px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+    }
+    .btn-block:hover {
+      background-color: #0056b3;
+    }
+    .alert-info {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="row justify-content-center align-items-center vh-100">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="title text-center mt-4">Login into Account</h4>
+          <div th:if="${param.error}">
+            <div class="text-center alert alert-info"><span class="text-danger font-weight-bold">INVALID OTP FOUND!</span></div>
+          </div>
+          <form class="form-box px-3" th:action="@{/sendOtp}" method="post" th:object="${otp}">
+            <div class="text-center mb-4"> <span class="text-info">A code has been sent to</span> <small>*****Mail</small> </div>
+            <div class="form-input">
+              <span><i class="fa fa-key"></i></span> <input type="text" name="otp" placeholder="Enter OTP" tabindex="10" required>
+            </div>
+            <div class="mb-3">
+              <button type="submit" class="btn btn-block text-uppercase">Validate</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

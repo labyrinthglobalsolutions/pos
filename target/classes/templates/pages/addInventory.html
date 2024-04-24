@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Home</title>
+    <style>
+        /* Increase label size */
+        label.col-form-label {
+            font-size: 18px;
+        }
+
+        /* Increase text size */
+        input.form-control,
+        select.form-control {
+            font-size: 16px;
+        }
+
+        /* Modify button */
+        button[type="submit"] {
+            font-size: 18px;
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="row">
+        <div class="col-lg-12 stretch-card"></div>
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Product</h4>
+                    <form id="insertInventoryForm" method="post">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Inventory</label>
+                                <select type="text" class="form-control" name="product_id" id="product_id" onchange="getProductCode(this.value)"></select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Product Code</label>
+                                <input type="text" class="form-control" name="product_code" id="product_code" readonly>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Batch Number</label>
+                                <input type="text" class="form-control" name="batch_no" id="batch_no" >
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Selling Price</label>
+                                <input type="text" class="form-control" name="selling_price" id="selling_price" >
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label class="col-form-label">Quantity</label>
+                                <input type="number" class="form-control" name="quentity" id="quentity" >
+                            </div>
+                        </div>
+                        <!-- Add other fields here -->
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        $(document).on('submit', '#insertInventoryForm', function (event) {
+            event.preventDefault();
+            if ($("#insertInventoryForm").find('input.is-invalid').length === 0) {
+                var formData = new FormData();
+                formData.append('batch_no', $("#batch_no").val());
+                formData.append('product_id', $("#product_id").val());
+                formData.append('quentity', parseInt($("#quentity").val()));//
+                formData.append('selling_price', $("#selling_price").val());
+                formData.append('productCode', $("#product_code").val());
+                $.ajax({
+                    url: "/inventory/addInventory",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    success: function (data) {
+                        showMessage('Good Job !!', 'Data Successfully Added!!!!', 'success');
+                        $('#insertForm')[0].reset();
+                        $('#insertModal').modal('hide'); // Corrected 'toggle' to 'modal' for hiding the modal
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                    },
+                    error: function (xhr, status, error) {
+                        showMessage('Error !!', 'Failed to add data', 'danger');
+                    }
+                });
+            } else {
+                showMessage('Ooops !!', 'Wrong Data', 'danger');
+            }
+        });
+
+        function getProductCode(product_id)
+        {
+            $.ajax({
+                url:"/products/edit/"+product_id,
+                type: "GET",
+                dataType:"json",
+                success: function (data) {
+                    console.log(data);
+                    $("#product_code").val(data['productCode']);
+                },
+                error: function (xhr, status, error) {
+                    showMessage('Error !!', 'Failed to retrieve category data', 'danger');
+                }
+            })
+        }
+    </script>
+</section>
+</body>
+</html>
