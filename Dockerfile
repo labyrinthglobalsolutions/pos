@@ -1,5 +1,5 @@
 # Use an official Maven 3.9.6 image with Amazon Corretto 8 as a base image for building
-FROM maven:4.0.0 AS builder
+FROM maven:latest AS builder
 
 # Set the working directory in the container
 WORKDIR /app
