@@ -1,17 +1,11 @@
 # Use an official Maven image with Amazon Corretto 8 as a base image for building
-FROM maven:3.9.6-openjdk-7 AS builder
+FROM maven:3.9.6 AS builder
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy only the Maven project file to leverage Docker layer caching
-COPY pom.xml .
-
-# Download dependencies
-RUN mvn dependency:go-offline -B
-
-# Copy the entire project source code
-COPY src ./src
+# Copy the entire Maven project
+COPY . .
 
 # Build the application without debugging output
 RUN mvn clean package -DskipTests
