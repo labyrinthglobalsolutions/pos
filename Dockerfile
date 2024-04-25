@@ -8,9 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application without debugging output and name the JAR file
-RUN mvn clean package -DskipTests -DfinalName=Point_Of_Sale && \
-    echo "Generated JAR file: Point_Of_Sale.jar" && \
-    ls -lh /app/target/Point_Of_Sale.jar
+RUN mvn clean package -DskipTests 
 
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
@@ -19,10 +17,10 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR file from the builder stage
-COPY --from=builder /app/target/Point_Of_Sale.jar .
+COPY --from=builder /app/target/Point_Of_Sale-0.0.1-SNAPSHOT.jar .
 
 # Expose port 9094
 EXPOSE 9094
 
 # Command to run the application
-CMD ["java", "-jar", "Point_Of_Sale.jar"]
+CMD ["java", "-jar", "Point_Of_Sale-0.0.1-SNAPSHOT.jar"]
