@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy the entire Maven project
 COPY . .
 
-# Build the application without debugging output
-RUN mvn clean package -DskipTests
+# Build the application without debugging output and name the JAR file
+RUN mvn clean package -DskipTests -DfinalName=Point_Of_Sale
 
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
