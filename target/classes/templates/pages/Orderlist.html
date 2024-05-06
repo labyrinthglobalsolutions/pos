@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        /* Add custom styles here */
+        .btn-custom {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #f0f0f0;
+        }
+
+        .btn-green {
+            border: 2px solid green;
+            color: green;
+        }
+
+        .btn-green:hover {
+            border-color: #99ff99;
+            background-color: #99ff99; /* Adjust hover background color */
+        }
+
+        .btn-orange {
+            border: 2px solid orange;
+            color: orange;
+        }
+
+        .btn-orange:hover {
+            border-color: #ffcc99;
+            background-color: #ffcc99; /* Adjust hover background color */
+        }
+
+        .btn-red {
+            border: 2px solid red;
+            color: red;
+        }
+
+        .btn-red:hover {
+            border-color: #ff9999;
+            background-color: #ff9999; /* Adjust hover background color */
+        }
+
+        .btn-yellow {
+            border: 2px solid black;
+            color: yellow;
+        }
+
+        .btn-yellow:hover {
+            border-color: #ffff99;
+            background-color: #ffff99; /* Adjust hover background color */
+        }
+
+        .btn-blue {
+            border: 2px solid blue;
+            color: blue;
+        }
+
+        .btn-blue:hover {
+            border-color: #99ccff;
+            background-color: #99ccff; /* Adjust hover background color */
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <div class="row">
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <div class="card-header text-right">
+                    <button type="button" class="btn btn-green btn-custom" data-toggle="modal" data-target="#insertModal">OrderList</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">ViewOrder</h4>
+                    <div class="table-responsive">
+                        <table id="viewOrder" class="table table-bordered dataTable">
+                            <thead>
+                            <tr>
+                                <td>SNo.</td>
+                                <th>ID</th>
+                                <th>Invoice Id</th>
+                                <th>Customer name</th>
+                                <th>Total Price</th>
+                                <th>Print</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            listData();
+        });
+
+        function listData() {
+            var table = $('#viewOrder').DataTable({
+                serverSide: true,
+                processing: true,
+                searchDelay: 500,
+                ajax: {
+                    url: "/pos/listing",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: function (d) {
+                        return JSON.stringify(d);
+                    }
+                },
+                "bDestroy": true,
+                "columnDefs": [{
+                    "target": [0, 3, 4],
+                    "orderable": false
+                }],
+                dom: 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        className: 'mr-2 btn btn-blue btn-custom',
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'mr-2 btn btn-yellow btn-custom',
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'mr-2 btn btn-red btn-custom',
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'mr-2 btn btn-orange btn-custom',
+                    },
+                    {
+                        extend: 'print',
+                        className: 'mr-2 btn btn-green btn-custom',
+                    },
+                ],
+                columns: [
+                    {data: "1"},
+                    {data: "id"},
+                    {data: "orderId"},
+                    {data: "customerId"},
+                    {data: "grandTotal"},
+                    {
+                        data: "Action",
+                        render: function (data, type, row, meta) {
+                            let order_id_encode = btoa(row['orderId']);
+                            var button = "";
+                            button += '<a href="/pages/invoice?order_id="+order_id_encode class="btn btn-default btn-xs">Print</a>';
+                            return button;
+                        }
+                    },
+                ]
+            }).buttons().container().appendTo('#viewInventory_wrapper .col-md-6:eq(0)');
+        }
+    </script>
+</section>
+</body>
+</html>

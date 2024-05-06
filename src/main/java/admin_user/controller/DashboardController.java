@@ -77,6 +77,11 @@ public class DashboardController {
         return new ModelMap();
     }
 
+    @GetMapping(value = "/Orderlist")
+    public ModelMap adminordelist(){
+        return new ModelMap();
+    }
+
     @Autowired
     UserService userService;
 

@@ -67,18 +67,18 @@
 
   transition: background 1s;
   color: white;
-  padding: 5px 5px 5px;
-  margin-bottom: 5px;
+  padding: 10px 3px 10px;
+  margin-bottom: 10px;
   cursor: pointer;
 
   border-radius: 5px;
-  height: 80px;
-  width: 100px;
+  height: 85px;
+  width: 115px;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 12spx;
+  font-size: 12px;
 }
 
 .module-box:hover {
@@ -151,7 +151,7 @@ background-position: 100% 100%;
 
   color: white;
 
-  padding: 5px;
+  padding: 16px;
 
   font-size: 12px;
 
@@ -307,10 +307,9 @@ background-position: 100% 100%;
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
                     <!-- Add gap at the top -->
-                    <li class="nav-item" style="margin-top: 15px;"></li>
                     <!-- Dashboard Module -->
                     <a th:href="@{dashboard}">
-                        <li class="nav-item" style="margin-top: 15px;" id="hover-item-1">
+                        <li class="nav-item" style="margin-top: 30px;" id="hover-item-1">
                             <div class="module-box" id="dashboard">
                                 <i class="menu-icon mdi mdi-television"></i>
                                 <span class="menu-title" >Dashboard</span>
@@ -320,7 +319,7 @@ background-position: 100% 100%;
 
 
                     <a th:href="@{pos}">
-                        <li class="nav-item" style="margin-top: 15px;">
+                        <li class="nav-item" style="margin-top: 20px;">
                             <div class="module-box" id="pos">
                                 <i class="menu-icon mdi mdi-receipt-text"></i>
                                 <span class="menu-title" >POS</span>
@@ -329,7 +328,7 @@ background-position: 100% 100%;
                     </a>
 
                     <a th:href="@{orders-list}">
-                        <li class="nav-item" style="margin-top: 15px;">
+                        <li class="nav-item" style="margin-top: 20px;">
                             <div class="module-box" id="ordersList">
                                 <i class="menu-icon mdi mdi-receipt-text"></i>
                                 <span class="menu-title" >Orders List</span>
@@ -338,7 +337,7 @@ background-position: 100% 100%;
                     </a>
 
                     <a th:href="@{user-profile}">
-                        <li class="nav-item" style="margin-top: 15px;">
+                        <li class="nav-item" style="margin-top: 20px;">
                             <div class="module-box" id="userprofile">
                                 <i class="menu-icon mdi mdi-receipt-text"></i>
 
@@ -348,10 +347,10 @@ background-position: 100% 100%;
                     </a>
 
                     <!-- Inventory Module -->
-                    <li class="nav-item dropdown" style="margin-top: 15px;">
+                    <li class="nav-item dropdown" style="margin-top: 20px;">
                         <div class="module-box dropbtn" id="inventory-module" >
                             <i class="menu-icon mdi mdi-cart-plus"></i>
-                            <span class="menu-title">Inventory</span>
+                            <span class="menu-title">Inventory Module</span>
                             <i class="menu-arrow"></i>
                         </div>
                         <div class="collapse  dropdown-content " id="ui-inventory">
@@ -366,15 +365,20 @@ background-position: 100% 100%;
                                         View Inventory
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{Orderlist}">
+                                        Order List
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>
 
                     <!-- User Management Module -->
-                    <li class="nav-item dropdown" style="margin-top: 15px;">
+                    <li class="nav-item dropdown" style="margin-top: 20px;">
                         <div class="module-box dropbtn" id="user-management-module">
                             <i class="menu-icon mdi mdi-cart-plus"></i>
-                            <span class="menu-title">Users</span>
+                            <span class="menu-title">User Management</span>
                             <i class="menu-arrow"></i>
                         </div>
                         <div class="collapse dropdown-content" id="ui-user-management">
@@ -395,10 +399,10 @@ background-position: 100% 100%;
 
 
                     <!-- Product Module -->
-                    <li class="nav-item dropdown" style="margin-top: 15px;">
+                    <li class="nav-item dropdown" style="margin-top: 20px;">
                         <div class="module-box dropbtn" id="product-module">
                             <i class="menu-icon mdi mdi-cart-plus"></i>
-                            <span class="menu-title">Product</span>
+                            <span class="menu-title">Product Module</span>
                             <i class="menu-arrow"></i>
                         </div>
                         <div class="collapse dropdown-content" id="ui-product">
@@ -415,14 +419,14 @@ background-position: 100% 100%;
                         </div>
                     </li>
                     <!-- Expenses Module -->
-                    <li class="nav-item" style="margin-top: 15px;">
+                    <li class="nav-item" style="margin-top: 20px;">
                         <div class="module-box" id="expenses">
                             <i class="menu-icon mdi mdi-currency-rupee"></i>
                             <span class="menu-title">Expenses</span>
                         </div>
                     </li>
                     <!-- Masters Module -->
-                    <li class="nav-item dropdown" style="margin-top: 15px;">
+                    <li class="nav-item dropdown" style="margin-top: 20px;">
                         <div class="module-box dropbtn" id="masters-module">
                             <i class="menu-icon mdi mdi-content-copy"></i>
                             <span class="menu-title">Masters</span>
@@ -442,8 +446,24 @@ background-position: 100% 100%;
                             </ul>
                         </div>
                     </li>
+
+
+                    <li class="nav-item dropdown" style="margin-top: 20px;">
+                        <div class="module-box dropbtn" id="order-module">
+                            <i class="menu-icon mdi mdi-cart-plus"></i>
+                            <span class="menu-title">Order List</span>
+                            <i class="menu-arrow"></i>
+                        </div>
+                        <div class="collapse dropdown-content" id="ui-Orderlist">
+                            <ul class="nav flex-column sub-menu">
+
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{vieworderlist}">Order List</a>
+                                </li>
+                            </ul>
+                        </div>
                     <!-- Settings Module -->
-                    <li class="nav-item" style="margin-top: 15px;">
+                    <li class="nav-item" style="margin-top: 20px;">
                         <div class="module-box" id="settings">
                             <i class="menu-icon mdi mdi-cog"></i>
                             <span class="menu-title">Settings</span>
@@ -451,7 +471,7 @@ background-position: 100% 100%;
                     </li>
                     <!-- Logout Module -->
                     <a th:href="@{/logout}">
-                        <li class="nav-item" style="margin-top: 15px;">
+                        <li class="nav-item" style="margin-top: 20px;">
                             <div class="module-box" id="logout">
                                 <i class="menu-icon mdi mdi-logout"></i>
 
@@ -629,7 +649,7 @@ background-position: 100% 100%;
                 console.log(response);
                 for(let i = 0; i<response.length; i++){
                     let resArr = response[i];
-                    html += '<option value="'+resArr['id']+'">'+resArr['subcategoryName']+'</option>';
+                    html += '<option value="'+resArr['id']+'">'+resArr['subcategory_name']+'</option>';
                 }
                 $("#subcategory_id").html(html);
             },

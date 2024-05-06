@@ -53,7 +53,7 @@ public class SecurityConfig {
 								"/pos/get-order-items/{id}", "/pos/get-order-details/{id}", "/place-order", "/pages/invoice", "/pos/get-invoice-details/{order_id}").hasAuthority("ADMIN")
 						.requestMatchers("vendors/*", "vendors/css/*", "vendors/js/*", "css/*", "images/*", "images/faces/*",
 								"js/*", "images/samples/*", "vendors/iconfonts/mdi/css/*", "vendors/iconfonts/mdi/fonts/*", "/*",
-								"/registration", "/forgot/**", "/resetemail", "/logout", "/login").permitAll()
+								"/registration", "/forgot/**", "/resetemail", "/logout", "/login", "/pos/listing").permitAll()
 						.anyRequest().authenticated())
 
 				.formLogin(form -> form.loginPage("/login")

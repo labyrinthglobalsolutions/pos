@@ -1,12 +1,20 @@
 package admin_user.service;
 
 import java.math.BigDecimal;
+import java.text.Collator;
 import java.text.DateFormat;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Predicate;
 
 import admin_user.model.*;
 import admin_user.repositories.*;
+import admin_user.service.container.PosContainer;
+import admin_user.service.request.Column;
+import admin_user.service.request.OrderCol;
+import admin_user.service.request.ServerSideRequest;
+import org.apache.commons.collections4.ComparatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +72,7 @@ public class PosService {
         posData.setOrderId(order_id);
         posData.setOrderStatus(order_status);
         posData.setsNo(Integer.parseInt(sNo));
+        posData.setDate(new Date());
         posRepository.save(posData);
         return "Success";
     }
@@ -251,4 +260,88 @@ public class PosService {
         posOverviewDetails.setPaymentMode(paymentMode);
         posRepository.save(posOverviewDetails);
     }
+
+
+
+
+    public PosContainer getListing(ServerSideRequest ssr) {
+        //
+        // Just for demo purposes.
+        //
+        long grandTotal = posRepository.count();
+        List<Pos> all = posRepository.findAll();
+
+        // interim results to get total rows after filtering:
+        List<Pos> filtered = all.stream()
+                .filter(containsText(normalize(ssr.search().value().toLowerCase())))
+                .toList();
+
+        // one page of results:
+        List<Pos> data = filtered.stream()
+                .sorted(buildSorter(ssr))
+                .skip(ssr.start())
+                .limit(ssr.length())
+                .toList();
+
+        return new PosContainer(ssr.draw(), grandTotal, filtered.size(), data);
+    }
+
+    private Comparator<? super Pos> buildSorter(ServerSideRequest ssr) {
+        // for multi-column sorting:
+        List<Comparator<Pos>> sortChain = new ArrayList<>();
+        for (OrderCol oc : ssr.order()) {
+            sortChain.add(buildComparatorClause(oc, ssr.columns(), getCollator()));
+        }
+        // combines list of comparators into one comparator:
+        return ComparatorUtils.chainedComparator(sortChain);
+    }
+
+    private Comparator<Pos> buildComparatorClause(OrderCol oc, List<Column> columns,
+                                                        Collator coll) {
+
+        // default sort:
+        Comparator<Pos> comp = Comparator.comparing(Pos::getOrderId, coll);
+        // which field to sort on - get column data name from column index:
+        String colName = columns.get(oc.column()).data();
+        switch (colName) {
+            case "sno" -> {
+            }
+            case "id" ->
+                    comp = Comparator.comparing(Pos::getId, coll);
+            case "order_id" ->
+                    comp = Comparator.comparing(Pos::getOrderId, coll);
+            case "customer_name" ->
+                    comp = Comparator.comparing(Pos::getCustomerId, coll);
+            case "grand_total" ->
+                    comp = Comparator.comparing(Pos::getGrandTotal, coll);
+        }
+        // ascending or descending:
+        return oc.dir().equals("asc") ? comp : comp.reversed();
+    }
+
+    private Predicate<? super Pos> containsText(String searchTerm) {
+        // search all fields for case-insensitive search term:
+        return e -> (e.getOrderId() != null && normalize(e.getOrderId().toLowerCase()).contains(searchTerm))
+                || (e.getOrderId() != null && normalize(e.getOrderId().toString()).contains(searchTerm));
+    }
+
+    private Collator getCollator() {
+        Collator coll = Collator.getInstance(Locale.US);
+        coll.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+        return coll;
+    }
+
+    private String normalize(String input) {
+        if (input == null) {
+            return null;
+        }
+        // NFD = canonical decomposition; \p{Mn} = non-spacing marks:
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{Mn}", "");
+    }
+
+
+
+
+
 }
