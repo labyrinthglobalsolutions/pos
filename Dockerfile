@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application without debugging output and name the JAR file
-RUN mvn clean package -DskipTests 
+RUN mvn clean package -DskipTests
 
 # Use a lightweight base image for the final container
 FROM openjdk:17-jdk-slim
@@ -16,11 +16,17 @@ FROM openjdk:17-jdk-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the built JAR file from the builder stage
-COPY --from=builder /app/target/Point_Of_Sale-0.0.1-SNAPSHOT.jar .
+# Copy the built JAR file(s) from the builder stage
+COPY --from=builder /app/target/Point_Of_Sale-*.jar ./
 
 # Expose port 8082
 EXPOSE 8082
 
+# Copy the shell script to run the JAR file
+COPY start.sh .
+
+# Grant execute permission to the shell script
+RUN chmod +x start.sh
+
 # Command to run the application
-CMD ["java", "-jar", "Point_Of_Sale-0.0.1-SNAPSHOT.jar"]
+CMD ["./start.sh"]
